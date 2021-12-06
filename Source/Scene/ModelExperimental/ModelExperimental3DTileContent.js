@@ -174,6 +174,7 @@ ModelExperimental3DTileContent.prototype.update = function (
   model.colorBlendMode = tileset.colorBlendMode;
   model.modelMatrix = tile.computedTransform;
   model.customShader = tileset.customShader;
+  model.imageBasedLightingParameters = tileset.imageBasedLightingParameters;
 
   model.update(frameState);
 };
@@ -209,6 +210,7 @@ ModelExperimental3DTileContent.fromGltf = function (
     content: content,
     colorBlendMode: tileset.colorBlendMode,
     colorBlendAmount: tileset.colorBlendAmount,
+    imageBasedLightingFactor: tileset.imageBasedLightingFactor,
   };
   content._model = ModelExperimental.fromGltf(modelOptions);
   return content;
