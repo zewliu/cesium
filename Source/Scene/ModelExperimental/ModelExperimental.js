@@ -1,5 +1,6 @@
 import Check from "../../Core/Check.js";
 import ColorBlendMode from "../ColorBlendMode.js";
+import ImageBasedLightingParameters from "../ImageBasedLightingParameters.js";
 import defined from "../../Core/defined.js";
 import defaultValue from "../../Core/defaultValue.js";
 import DeveloperError from "../../Core/DeveloperError.js";
@@ -40,7 +41,7 @@ import Color from "../../Core/Color.js";
  * @param {Number} [options.colorBlendAmount=0.5] Value used to determine the color strength when the <code>colorBlendMode</code> is <code>MIX</code>. A value of 0.0 results in the model's rendered color while a value of 1.0 results in a solid color, with any value in-between resulting in a mix of the two.
  * @param {Number} [options.featureIdAttributeIndex=0] The index of the feature ID attribute to use for picking features per-instance or per-primitive.
  * @param {Number} [options.featureIdTextureIndex=0] The index of the feature ID texture to use for picking features per-primitive.
- *
+ * @param {ImageBasedLightingParameters} [options.imageBasedLightingParameters] Parameters to configure image-based lighting. When undefined, default settings will be used.
  * @experimental This feature is using part of the 3D Tiles spec that is not final and is subject to change without Cesium's standard deprecation policy.
  */
 export default function ModelExperimental(options) {
@@ -96,6 +97,12 @@ export default function ModelExperimental(options) {
   this._featureIdTextureIndex = defaultValue(options.featureIdTextureIndex, 0);
   this._featureTables = undefined;
   this._featureTableId = undefined;
+
+  var iblParameters = options.imageBasedLightingParameters;
+  if (!defined(iblParameters)) {
+    iblParameters = new ImageBasedLightingParameters();
+  }
+  this._imageBasedLightingParameters = iblParameters;
 
   // Keeps track of resources that need to be destroyed when the Model is destroyed.
   this._resources = [];
@@ -592,6 +599,8 @@ ModelExperimental.prototype.update = function (frameState) {
     this._customShader.update(frameState);
   }
 
+  this._imageBasedLightingParameters.update(frameState);
+
   // short-circuit if the model resources aren't ready.
   if (!this._resourcesLoaded) {
     return;
@@ -731,6 +740,7 @@ ModelExperimental.prototype.destroyResources = function () {
  * @param {Number} [options.colorBlendAmount=0.5] Value used to determine the color strength when the <code>colorBlendMode</code> is <code>MIX</code>. A value of 0.0 results in the model's rendered color while a value of 1.0 results in a solid color, with any value in-between resulting in a mix of the two.
  * @param {Number} [options.featureIdAttributeIndex=0] The index of the feature ID attribute to use for picking features per-instance or per-primitive.
  * @param {Number} [options.featureIdTextureIndex=0] The index of the feature ID texture to use for picking features per-primitive.
+ * @param {ImageBasedLightingParameters} [options.imageBasedLightingParameters] Parameters to configure image-based lighting. When undefined, default settings will be used.
  *
  * @returns {ModelExperimental} The newly created model.
  */
@@ -782,6 +792,7 @@ ModelExperimental.fromGltf = function (options) {
     colorBlendMode: options.colorBlendMode,
     featureIdAttributeIndex: options.featureIdAttributeIndex,
     featureIdTextureIndex: options.featureIdTextureIndex,
+    imageBasedLightingParameters: options.imageBasedLightingParameters,
   };
   var model = new ModelExperimental(modelOptions);
 
