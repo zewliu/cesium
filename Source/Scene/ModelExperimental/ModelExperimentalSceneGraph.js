@@ -5,6 +5,7 @@ import defaultValue from "../../Core/defaultValue.js";
 import defined from "../../Core/defined.js";
 import Matrix4 from "../../Core/Matrix4.js";
 import CustomShaderPipelineStage from "./CustomShaderPipelineStage.js";
+import ImageBasedLightingPipelineStage from "./ImageBasedLightingPipelineStage.js";
 import LightingPipelineStage from "./LightingPipelineStage.js";
 import ModelColorPipelineStage from "./ModelColorPipelineStage.js";
 import ModelExperimentalPrimitive from "./ModelExperimentalPrimitive.js";
@@ -200,6 +201,8 @@ ModelExperimentalSceneGraph.prototype.buildDrawCommands = function (
   if (defined(model.color)) {
     modelPipelineStages.push(ModelColorPipelineStage);
   }
+
+  modelPipelineStages.push(ImageBasedLightingPipelineStage);
 
   var i, j, k;
   for (i = 0; i < modelPipelineStages.length; i++) {
