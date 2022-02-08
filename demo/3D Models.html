@@ -21,10 +21,21 @@
 <body>
     <div id="cesiumContainer"></div>
     <script>
+        let imageryProvider = new Cesium.WebMapTileServiceImageryProvider({
+                url: 'http://t0.tianditu.com/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=7711a24780452f03bb7c02fba98183b9',
+                layer: 'img',
+                style: 'default',
+                format: 'tiles',
+                tileMatrixSetID: 'w',
+                credit: new Cesium.Credit('天地图全球影像服务'),
+                // maximumLevel:7,
+                show:false,
+        });        
         // window.CESIUM_BASE_URL = "/Build/Cesium";
         Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0NTQyOWU1Ny1mYTY3LTRlODYtYjU3OC1jN2Y1MDAyOTgzMDYiLCJpZCI6NTYxMzgsImlhdCI6MTYyMTI2ODMzN30.W6jBJEE313uIN_ftYA2p9UhJzYVJaoJfj7wvct6Nndc';
         const viewer = new Cesium.Viewer('cesiumContainer', {
-            terrainProvider: Cesium.createWorldTerrain()
+            terrainProvider: Cesium.createWorldTerrain(),
+            imageryProvider: imageryProvider,
         });
         // const buildingTileset = viewer.scene.primitives.add(Cesium.createOsmBuildings());
         // viewer.camera.flyTo({
