@@ -38,51 +38,38 @@
                 tileMatrixSetID: 'w',
                 credit: new Cesium.Credit('天地图全球标注服务'),
                 show:false,
-        });         
+        });
+        let arcgisStreetImageryProvider = new Cesium.ArcGisMapServerImageryProvider({
+            url: "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer",
+        });
+        let arcgisSatImageryProvider = new Cesium.ArcGisMapServerImageryProvider({
+            url: "http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
+        });        
         // window.CESIUM_BASE_URL = "/Build/Cesium";
         Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0NTQyOWU1Ny1mYTY3LTRlODYtYjU3OC1jN2Y1MDAyOTgzMDYiLCJpZCI6NTYxMzgsImlhdCI6MTYyMTI2ODMzN30.W6jBJEE313uIN_ftYA2p9UhJzYVJaoJfj7wvct6Nndc';
         const viewer = new Cesium.Viewer('cesiumContainer', {
             terrainProvider: Cesium.createWorldTerrain(),
-            imageryProvider: tdtSatImageryProvider,
+            imageryProvider: arcgisStreetImageryProvider,
         });
-        viewer.scene.imageryLayers.addImageryProvider(tdtLabelImageryProvider);
-        let model = '/Specs/Data/Models/CesiumAir/Cesium_Air.gltf';
-        model = '/Apps/SampleData/models/CesiumAir/Cesium_Air.glb';
-        createModel(model, [116.24, 40.07, 50000]);
-        function createModel(model, coords) {
-            viewer.entities.removeAll();
-            const position = Cesium.Cartesian3.fromDegrees(coords[0], coords[1], coords[2]); // 坐标
-            const heading = Cesium.Math.toRadians(0);
-            const pitch = Cesium.Math.toRadians(0);
-            const roll = Cesium.Math.toRadians(0);
-            const hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
-            const orientation = Cesium.Transforms.headingPitchRollQuaternion(position, hpr);
-            const entity = viewer.entities.add({
-                name: model,
-                position,
-                orientation,
-                model: {
-                    uri: model,
-                    minimumPixelSize: 128,
-                    maxmumScale: 20000,
-                    color: getColor('green', 1),
-                    colorBlendMode: Cesium.ColorBlendMode.MIX, // REPLACE, MIX, HIGHLIGHT
-                    colorBlendAmount: 0.5,
-                    silhouetteColor: getColor('red', 0.1),
-                    silhouetteSize: 2,
-                },
-            });
-            viewer.trackEntity = entity;
-            viewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromDegrees(coords[0], coords[1], coords[2] + 100000),
-                orientation,
-            });            
-        }
+        // viewer.scene.imageryLayers.addImageryProvider(arcgisSatImageryProvider);
+        viewer.scene.globe.depthTestAgainstTerrain = true;
+        const tileset = new Cesium.Cesium3DTileset({
+            url: '/Specs/Data/Cesium3DTiles/Tilesets/Tileset/tileset.json'
+        })
 
-        function getColor(colorName, alpha) {
-            var color = Cesium.Color[colorName.toUpperCase()];
-            return Cesium.Color.fromAlpha(color, parseFloat(alpha));
-        }
+        tileset.readyPromise.then(function(tileset) {
+            viewer.scene.primitives.add(tileset);
+            viewer.zoomTo(tileset, new Cesium.HeadingPitchRange(0, -0.5, tileset.boundingSphere.radius * 2.0));
+            const height = 100;
+            const pnt = Cesium.Cartographic.fromCartesian(tileset.boundingSphere.center);
+            const basePnt = Cesium.Cartesian3.fromRadians(pnt.longitude, pnt.latitude, 0);
+            const targetPnt = Cesium.Cartesian3.fromRadians(pnt.longitude, pnt.latitude, height);
+            const translation = Cesium.Cartesian3.subtract(targetPnt, basePnt, new Cesium.Cartesian3())
+            tileset.modelMatrix = Cesium.Matrix4.fromTranslation(translation);
+        }).otherwise(function(err) {
+            console.log(err);
+        });
+
     </script>
 </body>
 </html>
