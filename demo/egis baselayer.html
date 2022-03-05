@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/Build/Cesium/Cesium.js"></script>
+    <link href="/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <style>
+        html,
+        body,
+        #cesiumContainer {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            cursor: default;
+        }
+    </style>
+    <title>3D Models</title>
+</head>
+
+<body>
+    <div id="cesiumContainer"></div>
+    <script>
+        let matrixIds = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18"];
+        let egisSatImageryProvider = new Cesium.WebMapTileServiceImageryProvider({
+            url: 'http://120.52.31.31:590/service/api/egis/base/v1/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=c&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&Authorization=Basic MjJhNDJmNjVjOGM0NDcyNGI1NzAzZWZkNTRiZjU3ODI6YWE5MDAxNTMyYmQzNDI3OWE5N2UzYjAxYmY2MTczZjk=', //服务地址，如：'http://localhost:8080/geoserver/gwc/service/wmts'
+            layer: "img", //图层名称，如：'tasmania'
+            style: 'default',
+            format: 'tiles',
+            tilematrixset: 'c',
+            tileMatrixSetID: 'c',
+            tileMatrixLabels: matrixIds,
+            tilingScheme: new Cesium.GeographicTilingScheme({
+                numberOfLevelZeroTilesX: 2,
+                numberOfLevelZeroTilesY: 1
+            })
+        });
+        let egisLabelImageryProvider = new Cesium.WebMapTileServiceImageryProvider({
+            url: 'http://120.52.31.31:590/service/api/egis/base/v1/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cta&tileMatrixSet=c&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&Authorization=Basic MjJhNDJmNjVjOGM0NDcyNGI1NzAzZWZkNTRiZjU3ODI6YWE5MDAxNTMyYmQzNDI3OWE5N2UzYjAxYmY2MTczZjk=', //服务地址，如：'http://localhost:8080/geoserver/gwc/service/wmts'
+            layer: "cta", //图层名称，如：'tasmania'
+            style: 'default',
+            format: 'tiles',
+            tilematrixset: 'c',
+            tileMatrixSetID: 'c',
+            tileMatrixLabels: matrixIds,
+            tilingScheme: new Cesium.GeographicTilingScheme({
+                numberOfLevelZeroTilesX: 2,
+                numberOfLevelZeroTilesY: 1
+            })
+        });
+        const terrainProvider = new Cesium.CesiumTerrainProvider({
+            url: 'http://120.52.31.31:590/service/api/egis/3d/v1/terrain1?Authorization=Basic MjJhNDJmNjVjOGM0NDcyNGI1NzAzZWZkNTRiZjU3ODI6YWE5MDAxNTMyYmQzNDI3OWE5N2UzYjAxYmY2MTczZjk='
+        });
+        const viewer = new Cesium.Viewer('cesiumContainer', {
+            terrainProvider,
+            imageryProvider: egisSatImageryProvider,
+        });
+        viewer.scene.imageryLayers.addImageryProvider(egisLabelImageryProvider);
+        viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(103.0655, 27.4796, 3000),
+        }); 
+    </script>
+</body>
+
+</html>
